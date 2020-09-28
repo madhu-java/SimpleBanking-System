@@ -1,10 +1,39 @@
 package banking;
 
+import org.sqlite.SQLiteDataSource;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        //reading database name from commandline
+        String dbName="";
+        if(args[0].equals("-fileName")) {
+             dbName = args[1];
+        }
+        //set url for sqlite database url
+        String url = "jdbc:sqlite:"+dbName;
+        //create  SQLiteDataSource object
+        SQLiteDataSource dataSource = new SQLiteDataSource();
+        //set url
+        dataSource.setUrl(url);
+        //establish connection
+        try (Connection con = dataSource.getConnection()) {
+            //create statement
+            Statement statement = con.createStatement();
+           //execute
+            statement.executeUpdate("create table if not exists card"+
+                    "(id integer,"+
+                    "number text,"+
+                    "pin text,"+
+                    "balance integer default 0)");
 
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
         Scanner scanner = new Scanner(System.in);
         String menu = "1. Create an account" +
                 "\n2. Log into account" +
@@ -22,11 +51,27 @@ public class Main {
                 case 1:
                     Card card = new Card();
                     //create card
-                   // System.out.println("card created ");
+                    // System.out.println("card created ");
+                    //saving created card to map
                     cards.put(card.getCardNumber(), card);
-                   // System.out.println("stored in cards");
-                   System.out.printf("Your card has been created\nYour card number:\n%s\nYour card PIN:\n%d\n",
-                           card.getCardNumber(), card.getPin());
+                    //saving created card to card table
+                    try(Connection con = dataSource.getConnection()){
+                        try(Statement statement = con.createStatement()){
+                            statement.executeUpdate("insert into card values("+
+                                    1+","+
+                                    card.getCardNumber()+","+
+                                    card.getPin()+","+
+                                    card.getBalance()+")");
+                        }
+                        catch(SQLException e){
+                            e.printStackTrace();
+                        }
+                    }catch(SQLException e){
+                        e.printStackTrace();
+                    }
+                    // System.out.println("stored in cards");
+                    System.out.printf("Your card has been created\nYour card number:\n%s\nYour card PIN:\n%d\n",
+                            card.getCardNumber(), card.getPin());
                     break;
                 case 2:
                     System.out.println("Enter your card number:");

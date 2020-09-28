@@ -13,7 +13,7 @@ public class Card {
     int pin;
     double balance;
 
-//create card following Luhn algorithem
+    //create card following Luhn algorithem
     public Card(){
         //initialising card with IIN 400000
         this.card=new ArrayList<>(Arrays.asList(4, 0, 0, 0, 0, 0));
@@ -42,7 +42,7 @@ public class Card {
     }
 
     private int validateWithLuhnAlgo(ArrayList<Integer> actualCard) {
-       //drop the last digit
+        //drop the last digit
         //card.remove(card.size()-1);
         ArrayList<Integer> card =  new ArrayList<Integer>(actualCard);
         //multiply odd digits by 2;
@@ -98,5 +98,4 @@ public class Card {
         return this.balance;
     }
 }
-
 
